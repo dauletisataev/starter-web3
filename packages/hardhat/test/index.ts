@@ -45,15 +45,19 @@ describe("PLT", function () {
   });
 
   it("Should successfully create cars", async function () {
+    await parkingLotToken.transfer(addr1.address, 1000000);
     const CarItem = await ethers.getContractFactory("CarItem");
     carItem = await CarItem.deploy(parkingLotToken.address);
     await parkingLotToken.approve(carItem.address, 100000000);
+    await parkingLotToken.connect(addr1).approve(carItem.address, 100000000);
     const car1Tx = await carItem.createCar(
       "https://imageio.forbes.com/specials-images/imageserve/5d35eacaf1176b0008974b54/0x0.jpg?format=jpg&crop=4560,2565,x790,y784,safe&fit=crop"
     );
-    const car2Tx = await carItem.createCar(
-      "https://imageio.forbes.com/specials-images/imageserve/5d35eacaf1176b0008974b54/0x0.jpg?format=jpg&crop=4560,2565,x790,y784,safe&fit=crop"
-    );
+    const car2Tx = await carItem
+      .connect(addr1)
+      .createCar(
+        "https://imageio.forbes.com/specials-images/imageserve/5d35eacaf1176b0008974b54/0x0.jpg?format=jpg&crop=4560,2565,x790,y784,safe&fit=crop"
+      );
     await expect(car1Tx).to.emit(carItem, "Created");
     await expect(car2Tx).to.emit(carItem, "Created");
 
@@ -73,6 +77,8 @@ describe("PLT", function () {
   });
 
   it("Should successfully park cars and retrieve", async function () {
+    await parkingLotToken.transfer(addr1.address, 1000000);
+
     const ParkingLot = await ethers.getContractFactory("ParkingLot");
     const parkingLot = await ParkingLot.deploy(
       parkingLotToken.address,
@@ -80,15 +86,16 @@ describe("PLT", function () {
     );
 
     carItem.approveFor(parkingLot.address);
+    carItem.connect(addr1).approveFor(parkingLot.address);
 
     expect(await parkingLot.park(car1Id))
       .to.emit(parkingLot, "Parked")
       .withArgs(owner.address, car1Id);
-    expect(await parkingLot.park(car2Id))
+    expect(await parkingLot.connect(addr1).park(car2Id))
       .to.emit(parkingLot, "Parked")
-      .withArgs(owner.address, car2Id);
+      .withArgs(addr1.address, car2Id);
     expect(await parkingLot.availableLots()).to.equal(198);
-    expect((await parkingLot.parkedCars(owner.address)).length).to.equal(2);
+    expect((await parkingLot.parkedCars(owner.address)).length).to.equal(1);
 
     await parkingLotToken.approve(parkingLot.address, 100000);
 

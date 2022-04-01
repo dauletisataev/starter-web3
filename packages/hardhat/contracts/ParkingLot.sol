@@ -4,12 +4,14 @@ import "./ParkingLotToken.sol";
 import "./CarItem.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 contract ParkingLot is IERC721Receiver {
     struct ParkedCar {
         uint256 carId;
         uint256 parkedAt;
     }
+    using SafeERC20 for IERC20;
     uint256 totalLots = 200;
     mapping(address => ParkedCar[]) public userCars;
     ParkingLotToken private plt;
@@ -72,7 +74,7 @@ contract ParkingLot is IERC721Receiver {
         userCars[msg.sender].pop();
 
         carRegistry.safeTransferFrom(address(this), msg.sender, carId);
-        plt.transferFrom(msg.sender, address(this), fee);
+        IERC20(plt).safeTransferFrom(msg.sender, address(this), fee);
         totalLots += 1;
         emit Retrieved(fee);
         return fee;
