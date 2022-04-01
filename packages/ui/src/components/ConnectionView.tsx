@@ -1,11 +1,17 @@
 import React from "react";
-import { useConnect, useAccount } from "wagmi";
+import { useBalance, useConnect, useAccount } from "wagmi";
 
 function ConnectionView() {
   const [{ data: connectData, error }, connect] = useConnect();
   const [{ data: accountData }, disconnect] = useAccount({
     fetchEns: true,
   });
+  const [{ data: balance }] = useBalance({
+    addressOrName: accountData?.address,
+  });
+
+  console.log("connection data:", connectData);
+  console.log("account balance: ", balance);
 
   return accountData ? (
     <div>
