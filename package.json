@@ -7,6 +7,18 @@
   "workspaces": {
     "packages": [
       "packages/*"
+    ],
+    "nohoist": [
+      "**/hardhat",
+      "**/hardhat/**",
+      "**/hardhat-ts",
+      "**/hardhat-ts/**"
     ]
+  },
+  "scripts": {
+    "hardhat:chain": "yarn workspace @parking-web3/hardhat chain",
+    "hardhat:deploy": "yarn workspace @parking-web3/hardhat deploy",
+
+    "ui:start": "yarn workspace @parking-web3/ui start"
   }
 }
