@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useConnect, useContract, useProvider } from "wagmi";
+import { useConnect, useContract, useProvider, useAccount } from "wagmi";
 import ParkingLotToken from "@parking-web3/hardhat/artifacts/contracts/ParkingLotToken.sol/ParkingLotToken.json";
 
 function Parking() {
@@ -10,20 +10,23 @@ function Parking() {
     contractInterface: ParkingLotToken.abi,
     signerOrProvider: provider,
   });
+  const [{ data: accountData }, disconnect] = useAccount({
+    fetchEns: true,
+  });
 
-  const [totalSupply, setTotalSupply] = useState();
+  const [balance, setBalance] = useState();
 
   useEffect(() => {
     (async () => {
       if (connected) {
-        const sup = await contract.totalSupply();
-        setTotalSupply(sup.toString());
+        const sup = await contract.balanceOf(accountData?.address);
+        setBalance(sup.toString());
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [connected]);
 
-  return <div>Parking lots totalSupply: {totalSupply}</div>;
+  return <div>Current account balance: {balance}</div>;
 }
 
 export default Parking;
