@@ -7,6 +7,7 @@ import reportWebVitals from "./reportWebVitals";
 import { chain, defaultChains, Provider } from "wagmi";
 import { InjectedConnector } from "wagmi/connectors/injected";
 import { providers } from "ethers";
+import { NotificationsProvider } from "@mantine/notifications";
 
 const connectors = () => {
   return [
@@ -28,7 +29,9 @@ ReactDOM.render(
           : providers.getDefaultProvider();
       }}
     >
-      <App />
+      <NotificationsProvider position="top-right">
+        <App />
+      </NotificationsProvider>
     </Provider>
   </React.StrictMode>,
   document.getElementById("root")
